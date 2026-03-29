@@ -50,4 +50,4 @@ Tested on KOReader 2025.08 (Kindle PW5).
 
 ## License
 
-MIT
+AGPL-3.0 — see [LICENSE](LICENSE)
