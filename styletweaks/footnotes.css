@@ -1,0 +1,32 @@
+/* Hide list markers inside in-page footnote rendering */
+*, autoBoxing {
+    -cr-hint: late;
+    -cr-only-if: inside-inpage-footnote -inline;
+        list-style: none;
+}
+
+/* Use Neacademia Small Text for in-page footnotes */
+*, autoBoxing {
+    -cr-hint: late;
+    -cr-only-if: inside-inpage-footnote;
+        font-family: "Neacademia Small Text", serif;
+}
+
+/* Hide list markers on endnote lists (covers common publisher patterns) */
+[epub|type~="endnotes"] ol,
+[role~="doc-endnotes"] ol,
+section.notesSet ol,
+ol.notesList,
+ol.footnotes,
+ol.endnotes {
+    list-style-type: none !important;
+}
+
+/* Remove underline from footnote reference links and backlinks */
+[epub|type~="noteref"],
+[role~="doc-noteref"],
+[role~="doc-backlink"],
+[epub|type~="endnote"] a,
+[role~="doc-endnote"] a {
+    text-decoration: none !important;
+}

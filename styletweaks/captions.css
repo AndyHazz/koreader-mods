@@ -1,0 +1,8 @@
+/* Style figure captions */
+figcaption, .caption, .fig-caption {
+    font-size: 0.85em;
+    font-style: italic;
+    color: #555;
+    margin-top: 0.5em;
+    text-align: center;
+}

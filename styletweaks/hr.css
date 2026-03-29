@@ -1,0 +1,28 @@
+hr {
+  margin: 1.5rem auto;
+  border: 0;
+  text-align: center;
+}
+
+hr::after{
+    content: "✾✿✾";
+    content: "·  • ✦ •  ·";
+    content: "❋ ❋ ❋";
+    content: "❦❧✤✿✣✺✶✴❂✽❉❈❇✵✶✻✾❀✷✸✹❁❂❃❊❋";
+    content: "❇ ✻ ❇";
+    content: "⁂";
+    content: "❦";
+    font-size: 1.5rem;
+    color: #333;
+    font-weight: 300;
+}
+
+blockquote {
+    margin-left:0em !important;
+    margin:1em;
+    padding:0px;
+    padding-left:1.25em;
+    font-family: cursive;
+    font-size:1rem;
+    border-left: 1px dashed black;
+}

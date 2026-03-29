@@ -1,0 +1,24 @@
+/* Fix in-book TOC rendering: hide list markers on TOC ordered lists */
+nav[epub|type~="toc"] ol,
+nav[role~="doc-toc"] ol,
+nav.tocList ol,
+.tocList ol,
+ol[role="directory"] {
+    list-style-type: none !important;
+}
+
+.contentsH1, .contentsH2, .contentsH3 {
+    list-style-type: none !important;
+}
+
+/* Remove underlines from TOC links */
+nav[epub|type~="toc"] a,
+nav[role~="doc-toc"] a,
+.tocList a {
+    text-decoration: none !important;
+}
+
+/* Respect the HTML hidden attribute */
+[hidden] {
+    display: none !important;
+}

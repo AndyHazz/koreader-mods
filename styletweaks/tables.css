@@ -1,0 +1,16 @@
+/* Improve table rendering for non-fiction books */
+table {
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+
+th, td {
+    padding: 0.3em 0.5em;
+    border: 1px solid #999;
+}
+
+th {
+    font-weight: bold;
+    background-color: #eee;
+}

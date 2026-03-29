@@ -1,0 +1,18 @@
+/* Consistent paragraph indentation */
+p + p {
+    text-indent: 1.25em;
+}
+
+/* No indent after headings, breaks, or images */
+h1 + p, h2 + p, h3 + p, h4 + p, h5 + p, h6 + p,
+hr + p, figure + p, blockquote + p,
+div.chapter > p:first-child,
+section > p:first-child {
+    text-indent: 0 !important;
+}
+
+/* Spacing around lists in body text */
+ul, ol {
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+}

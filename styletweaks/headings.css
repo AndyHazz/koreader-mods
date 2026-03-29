@@ -1,0 +1,23 @@
+h1 a, h2 a {
+    text-decoration: none !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: fantasy;
+    font-weight: 300 !important;
+    color: black;
+    line-height: 1em;
+    border-bottom: 2px outset lightgrey;
+    background-color: #eee;
+    padding: 0.5em;
+    margin: 1em 0em 1em 0em !important;
+    display: inline-block;
+    text-align: left;
+}
+
+h1 { font-size: 1.8em; }
+h2 { font-size: 1.5em; }
+h3 { font-size: 1.3em; }
+h4 { font-size: 1.15em; }
+h5 { font-size: 1em; }
+h6 { font-size: 0.9em; }
