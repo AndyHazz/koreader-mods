@@ -33,7 +33,8 @@ local InspectorView = InputContainer:extend{
 function InspectorView:init()
     self.width = self.width or Screen:getWidth()
     self.height = self.height or Screen:getHeight()
-    self.dimen = Geom:new{ w = self.width, h = self.height }
+    self.dimen = Geom:new{ x = 0, y = 0, w = self.width, h = self.height }
+    self.covers_fullscreen = true -- prevent UIManager repainting underlying widgets
 
     if Device:hasKeys() then
         self.key_events.Close = { { Device.input.group.Back } }
@@ -286,11 +287,15 @@ function InspectorView:buildKeyValueRow(key, value, face, width)
 end
 
 function InspectorView:show()
-    UIManager:show(self, "full")
+    UIManager:show(self)
+    UIManager:setDirty(self, function()
+        return "ui", self.dimen
+    end)
 end
 
 function InspectorView:onClose()
-    UIManager:close(self, "full")
+    UIManager:close(self)
+    UIManager:setDirty(nil, "full")
     return true
 end
 
