@@ -45,6 +45,7 @@ Standalone shell scripts for one-off device maintenance. Run over SSH on the tar
 | Script | Description |
 |--------|-------------|
 | [syncthing-ext-storage.sh](scripts/syncthing-ext-storage.sh) | Moves Syncthing's SQLite database off VFAT (`/mnt/us`) to an ext3 partition (`/var/local`) on the Kindle. Fixes the "disk I/O error: no such file or directory" crash loop that Syncthing 2.x hits under burst write load on VFAT. Preserves the device ID by copying identity files; patches `syncthing.koplugin/main.lua`'s `homePath()` in-place. |
+| [invalidate-stale-bookinfo-cache.sh](scripts/invalidate-stale-bookinfo-cache.sh) | Invalidates stale rows in KOReader's `bookinfo_cache.sqlite3`. Compares each cached filemtime to the on-disk mtime and deletes rows where the file has been modified since extraction (e.g. after a metadata rewrite by an external tool). CoverBrowser re-extracts lazily on the next library view. |
 
 ## Installation paths
 
