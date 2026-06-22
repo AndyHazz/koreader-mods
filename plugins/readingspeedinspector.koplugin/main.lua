@@ -22,6 +22,12 @@ function ReadingSpeedInspector:init()
 end
 
 function ReadingSpeedInspector:addToMainMenu(menu_items)
+    -- The item lives under the "statistics" menu anchor (via sorting_hint), which
+    -- only exists when the statistics module is loaded. In incognito mode there
+    -- is no statistics module, so that anchor is absent -- registering anyway
+    -- would leave an orphaned sorting_hint and crash KOReader's menu sorter.
+    -- A speed inspector is also pointless without statistics, so just skip it.
+    if not self.ui.statistics then return end
     -- Use sorting_hint so the menu sorter places this inside the statistics
     -- submenu regardless of plugin load order.
     menu_items.reading_speed_inspector = {
