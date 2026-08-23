@@ -76,10 +76,29 @@ if Device:isKindle() then
         return ok and present
     end
 
-    -- Mirrors keepalive.koplugin's Kindle branch. os.execute is fine here:
-    -- this only ever runs on a plug/unplug/suspend/exit transition.
+    -- Set the property through KOReader's own lipc handle rather than shelling
+    -- out. keepalive.koplugin does this with
+    -- os.execute("lipc-set-prop com.lab126.powerd preventScreenSaver 1"), which
+    -- is fine there because it only ever runs from a menu tap -- but this patch
+    -- also runs it from _beforeSuspend, and forking a process while the system is
+    -- preparing to suspend, on a device with under 512 MB of RAM, is asking for
+    -- trouble. powerd's own KindlePowerD:init already holds an lipc handle
+    -- (device/kindle/powerd.lua) and drives flIntensity through it the same way,
+    -- so reuse it: same effect, in-process, no fork.
+    --
+    -- The os.execute path stays as a fallback for the case where liblipclua
+    -- didn't load and powerd has no handle, since then there's nothing to reuse.
     local function setPreventScreenSaver(on)
-        os.execute("lipc-set-prop com.lab126.powerd preventScreenSaver " .. (on and "1" or "0"))
+        local value = on and 1 or 0
+        local handle = Device.powerd and Device.powerd.lipc_handle
+        if handle then
+            local ok = pcall(function()
+                handle:set_int_property("com.lab126.powerd", "preventScreenSaver", value)
+            end)
+            if ok then return end
+            logger.warn("StayAwakeWhileCharging: lipc set failed, falling back to shell")
+        end
+        os.execute("lipc-set-prop com.lab126.powerd preventScreenSaver " .. value)
     end
 
     local function stayAwake()
