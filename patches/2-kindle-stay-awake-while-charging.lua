@@ -112,11 +112,25 @@ if Device:isKindle() then
     -- every transition out of "plugged in" routes through here, so releasing
     -- unconditionally is what stops a missed transition wedging the device
     -- permanently awake.
-    local function allowSleep()
-        logger.dbg("StayAwakeWhileCharging: releasing sleep inhibitors")
+    --
+    -- reset_idle gives powerd a fresh idle window on the way out. Without it,
+    -- unplugging put the device to sleep instantly with no screensaver: powerd's
+    -- t1 timer had been suppressed for however many hours the cable was in, so
+    -- the moment the suppression lifted it saw a long-expired timer and went
+    -- straight down. Strictly correct -- the device really had been idle that
+    -- long -- but pulling the cable shouldn't kill the device in your hand.
+    -- resetT1Timeout must run while still awake; its own comment notes it fails
+    -- once the screensaver is up. Skipped on the suspend and exit paths, where a
+    -- fresh idle window is either pointless or actively wrong.
+    local function allowSleep(reset_idle)
+        logger.dbg("StayAwakeWhileCharging: releasing sleep inhibitors",
+                   reset_idle and "(with idle reset)" or "")
         PluginShare.pause_auto_suspend = false
         PluginShare.keepalive = false
         setPreventScreenSaver(false)
+        if reset_idle and Device.powerd and Device.powerd.resetT1Timeout then
+            pcall(function() Device.powerd:resetT1Timeout() end)
+        end
     end
 
     local orig_beforeCharging = Device._beforeCharging
@@ -127,7 +141,8 @@ if Device:isKindle() then
 
     local orig_afterNotCharging = Device._afterNotCharging
     function Device:_afterNotCharging()
-        allowSleep()
+        -- Unplug: hand back a full idle window rather than a long-expired one.
+        allowSleep(true)
         return orig_afterNotCharging(self)
     end
 
