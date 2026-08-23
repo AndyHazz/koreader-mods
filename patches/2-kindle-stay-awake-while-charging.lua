@@ -38,7 +38,43 @@ local Device = require("device")
 
 if Device:isKindle() then
     local PluginShare = require("pluginshare")
+    local lfs = require("libs/libkoreader-lfs")
     local logger = require("logger")
+
+    local function readFirstLine(path)
+        local fh = io.open(path, "r")
+        if not fh then return nil end
+        local line = fh:read("*l")
+        fh:close()
+        return line
+    end
+
+    -- powerd's isCharging() reports charging *activity*, not whether the cable
+    -- is in: at full charge it goes false while still plugged (seen on a PW5 at
+    -- 99% -- isCharging 0, battery status "Discharging", yet the charger's
+    -- online flag still 1). The transition hooks below don't care, since they
+    -- fire off the USB plug/unplug event, but startup and resume have no event
+    -- to read and genuinely need "is it plugged in?".
+    --
+    -- Take that from sysfs: any supply that isn't the battery and reports
+    -- online. Excluding only type "Battery" rather than matching USB/AC keeps
+    -- wireless charging counted on the models that have a Wireless supply.
+    local function chargerPresent()
+        local ok, present = pcall(function()
+            local base = "/sys/class/power_supply"
+            for entry in lfs.dir(base) do
+                if entry ~= "." and entry ~= ".." then
+                    local dir = base .. "/" .. entry
+                    if readFirstLine(dir .. "/type") ~= "Battery"
+                        and readFirstLine(dir .. "/online") == "1" then
+                        return true
+                    end
+                end
+            end
+            return false
+        end)
+        return ok and present
+    end
 
     -- Mirrors keepalive.koplugin's Kindle branch. os.execute is fine here:
     -- this only ever runs on a plug/unplug/suspend/exit transition.
@@ -90,10 +126,7 @@ if Device:isKindle() then
     local orig_afterResume = Device._afterResume
     function Device:_afterResume(inhibit)
         local ret = orig_afterResume(self, inhibit)
-        local ok, charging = pcall(function()
-            return self.powerd:isCharging() and not self.powerd:isCharged()
-        end)
-        if ok and charging then stayAwake() end
+        if chargerPresent() then stayAwake() end
         return ret
     end
 
@@ -109,10 +142,7 @@ if Device:isKindle() then
 
     -- Apply the current state at startup: KOReader is frequently launched with
     -- the cable already in, which produces no transition to hook.
-    local ok, charging = pcall(function()
-        return Device.powerd:isCharging() and not Device.powerd:isCharged()
-    end)
-    if ok and charging then
+    if chargerPresent() then
         stayAwake()
     end
 end
